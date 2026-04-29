@@ -1,7 +1,7 @@
 # Kotlin jecktcompose arsp factory app 
 
 
-- damo.txtpb = test-list 
+ ``damo.txtpb = test-list`` 
 *路径:app/src/main/test_lists/xxxxxx.txtpb*
 
 # actions = pytests
