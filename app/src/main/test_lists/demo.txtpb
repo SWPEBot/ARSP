@@ -1,1 +1,1460 @@
-
+# proto-file: vendor/google_shared/packages/desktop/Factory/factory/app/src/main/proto/test_object.proto
+# proto-message: TestList
+options {
+  auto_run_on_start: {
+    value: true
+  }
+}
+tests {
+  label: "Ocicat-EVT test list"
+  subtests {
+    label: "Prepare device"
+    subtests {
+      label: "Expand userdata"
+      action_name: "ExpandUserdata"
+      args {
+        fields {
+          key: "expandThreshold"
+          value {
+            number_value: 1.0
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Barrier"
+      action_name: "CheckPoint"
+    }
+  }
+#  subtests {
+#    label: "安装预装应用"
+#   action_name: "InstallPreflashApp"
+#  }
+  subtests {
+    label: "同步工厂服务器时间"
+    action_name: "SyncFactoryServer"
+    args {
+      fields {
+        key: "syncDeviceTime"
+        value {
+          bool_value: true
+        }
+      }
+      fields {
+        key: "serverUrl"
+        value {
+          string_value: "10.17.5.1:8089,10.17.5.2:8089,10.17.5.3:8089"
+        }
+      }
+      fields {
+        key: "timeoutSecs"
+        value {
+          number_value: 999999999
+        }
+      }
+      fields {
+        key: "updateToolkit"
+        value {
+          bool_value: true
+        }
+      }
+      fields {
+        key: "updateWithoutPrompt"
+        value {
+          bool_value: true
+        }
+      }
+    }
+  }
+  subtests {
+    label: "更新工厂应用从Umpire"
+    action_name: "UpdateAppFromUmpire"
+    args {
+      fields {
+        key: "serverUrl"
+        value {
+          string_value: "10.17.5.1:8089,10.17.5.2:8089,10.17.5.3:8089"
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Storage Group"
+    subtests {
+      label: "Storage Health"
+      action_name: "StorageHealth"
+    }
+    subtests {
+      label: "Storage Simple Stress"
+      action_name: "StorageSimpleStress"
+    }
+  }
+  subtests {
+    label: "Scan MLB serial number"
+    action_name: "ScanDeviceData"
+    args {
+      fields {
+        key: "label"
+        value {
+          string_value: "MLB serial number"
+        }
+      }
+      fields {
+        key: "deviceDataKey"
+        value {
+          string_value: "serials.mlb_serial_number"
+        }
+      }
+    }
+  }
+  subtests {
+    label: "camera_group"
+    subtests {
+      label: "camera_qr_front"
+      action_name: "Camera"
+      args {
+        fields {
+          key: "facing"
+          value {
+            string_value: "LENS_FACING_FRONT"
+          }
+        }
+        fields {
+          key: "enableAssembly"
+          value {
+            bool_value: false
+          }
+        }
+      }
+    }
+    subtests {
+      label: "camera_qr_back"
+      action_name: "Camera"
+      args {
+        fields {
+          key: "facing"
+          value {
+            string_value: "LENS_FACING_BACK"
+          }
+        }
+        fields {
+          key: "enableAssembly"
+          value {
+            bool_value: false
+          }
+        }
+      }
+    }
+    subtests {
+      label: "camera_assemble_front"
+      action_name: "Camera"
+      args {
+        fields {
+          key: "facing"
+          value {
+            string_value: "LENS_FACING_FRONT"
+          }
+        }
+        fields {
+          key: "enableQr"
+          value {
+            bool_value: false
+          }
+        }
+      }
+    }
+    subtests {
+      label: "camera_qr_assemble_front"
+      action_name: "Camera"
+      args {
+        fields {
+          key: "facing"
+          value {
+            string_value: "LENS_FACING_FRONT"
+          }
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Touchpad Group"
+    subtests {
+      label: "Touchpad"
+      action_name: "Touchpad"
+    }
+  }
+  subtests {
+    label: "Touchscreen Group"
+    subtests {
+      label: "Touchscreen"
+      action_name: "Touchscreen"
+    }
+  }
+  subtests {
+    label: "Stylus Group"
+    subtests {
+      label: "Stylus"
+      action_name: "Stylus"
+    }
+  }
+  subtests {
+    label: "Thermal Sensor Group"
+    subtests {
+      label: "Thermal Sensor"
+      action_name: "ThermalSensor"
+    }
+  }
+  subtests {
+    label: "Accelerometer Group"
+    subtests {
+      label: "Base Accelerometer Calibration"
+      action_name: "AccelerometerCalibration"
+      args {
+        fields {
+          key: "autostart"
+          value {
+            bool_value: true
+          }
+        }
+        fields {
+          key: "location"
+          value {
+            string_value: "base"
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Display Accelerometer Calibration"
+      action_name: "AccelerometerCalibration"
+      args {
+        fields {
+          key: "location"
+          value {
+            string_value: "display"
+          }
+        }
+        fields {
+          key: "orientation"
+          value {
+            list_value {
+              values {
+                number_value: 0
+              }
+              values {
+                number_value: 0
+              }
+              values {
+                number_value: -1
+              }
+            }
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Base Accelerometer"
+      action_name: "Accelerometer"
+      args {
+        fields {
+          key: "autostart"
+          value {
+            bool_value: true
+          }
+        }
+        fields {
+          key: "location"
+          value {
+            string_value: "base"
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Display Accelerometer"
+      action_name: "Accelerometer"
+      args {
+        fields {
+          key: "location"
+          value {
+            string_value: "display"
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Accelerometer Lid Angle"
+      action_name: "AccelerometerLidAngle"
+    }
+  }
+  subtests {
+    label: "Tablet Rotation"
+    action_name: "TabletRotation"
+    args {
+      fields {
+        key: "mode"
+        value {
+          string_value: "CLASSIC"
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Tablet Mode"
+    action_name: "TabletMode"
+    args {
+      fields {
+        key: "timeoutSecs"
+        value {
+          number_value: 10
+        }
+      }
+    }
+  }
+  subtests {
+    label: "LED Test"
+    action_name: "Led"
+    args {
+      fields {
+        key: "testLedList"
+        value {
+          list_value {
+            values {
+              list_value {
+                values {
+                  string_value: "battery"
+                }
+                values {
+                  list_value {
+                    values {
+                      string_value: "White"
+                    }
+                    values {
+                      string_value: "Amber"
+                    }
+                    values {
+                      string_value: "Off"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      fields {
+        key: "autostart"
+        value { bool_value: true }
+      }
+    }
+  }
+  subtests {
+    label: "Nugget Group"
+    subtests {
+      label: "Nugget Simple Test"
+      action_name: "Lightbar"
+      args {
+        fields {
+          key: "testMode"
+          value {
+            string_value: "simple"
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Nugget Color Test"
+      action_name: "LightbarColor"
+    }
+  }
+  subtests {
+    label: "Gyroscope Group"
+    subtests {
+      label: "Base Gyroscope Calibration"
+      action_name: "GyroscopeCalibration"
+      args {
+        fields {
+          key: "autostart"
+          value {
+            bool_value: true
+          }
+        }
+        fields {
+          key: "location"
+          value {
+            string_value: "base"
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Display Gyroscope Calibration"
+      action_name: "GyroscopeCalibration"
+      args {
+        fields {
+          key: "location"
+          value {
+            string_value: "display"
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Base Gyroscope Angle"
+      action_name: "GyroscopeAngle"
+      args {
+        fields {
+          key: "autoStart"
+          value {
+            bool_value: true
+          }
+        }
+        fields {
+          key: "location"
+          value {
+            string_value: "base"
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Display Gyroscope Angle"
+      action_name: "GyroscopeAngle"
+      args {
+        fields {
+          key: "location"
+          value {
+            string_value: "display"
+          }
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Light Sensor"
+    action_name: "LightSensor"
+    args {
+      fields {
+        key: "darkThreshold"
+        value {
+          number_value: 30.0
+        }
+      }
+      fields {
+        key: "timeoutPerSubtest"
+        value {
+          number_value: 10
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Idle 10 secs"
+    action_name: "Idle"
+    args {
+      fields {
+        key: "timeoutSec"
+        value {
+          number_value: 10
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Fingerprint Group"
+    subtests {
+      label: "Fingerprint Sensor Elan"
+      action_name: "FingerprintSensorElan"
+    }
+    subtests {
+      label: "Fingerprint Sensor Focaltech"
+      action_name: "FingerprintSensorFocaltech"
+    }
+    subtests {
+      label: "Fingerprint Sensor Egis"
+      action_name: "FingerprintSensorEgis"
+    }
+    subtests {
+      label: "Enable FP Write Protect Elan"
+      action_name: "EnableFPWriteProtect"
+    }
+    subtests {
+      label: "Verify Fp Key"
+      action_name: "VerifyFpKey"
+    }
+    subtests {
+      label: "Fpmcu Initialize Entropy"
+      action_name: "FpmcuInitializeEntropy"
+    }
+    subtests {
+      label: "Update Fp Firmware"
+      action_name: "UpdateFpFirmware"
+      args {
+        fields {
+          key: "method"
+          value {
+            string_value: "CHECK_VERSION"
+          }
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Reboot"
+    action_name: "Reboot"
+  }
+  subtests {
+    label: "ShopFloorServiceView"
+    action_name: "ShopFloorServiceView"
+    args {
+      fields {
+        key: "developer"
+        value {
+          bool_value: true
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Debug set GBB flags"
+    action_name: "SetGbbFlags"
+    args {
+      fields {
+        key: "flags"
+        value {
+          number_value: 2147484217
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Display Group"
+    subtests {
+      label: "Display Point"
+      action_name: "DisplayPoint"
+      args {
+        fields {
+          key: "pointSize"
+          value {
+            number_value: 3.0
+          }
+        }
+        fields {
+          key: "maxPointCount"
+          value {
+            number_value: 5
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Backlight"
+      action_name: "Backlight"
+    }
+    subtests {
+      label: "External Display"
+      action_name: "ExternalDisplay"
+    }
+  }
+  subtests {
+    label: "keyboard Backlight"
+    action_name: "KeyboardBacklight"
+  }
+  subtests {
+    label: "Wi-Fi Connection Tests"
+    subtests {
+      label: "Connect to Wi-Fi"
+      action_name: "ConnectToWireless"
+      args {
+        fields {
+          key: "ssid"
+          value {
+            string_value: "test_ssid"
+          }
+        }
+        fields {
+          key: "passphrase"
+          value {
+            string_value: "test_passphrase"
+          }
+        }
+        fields {
+          key: "retries"
+          value {
+            number_value: 600
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Disconnect from Wi-Fi"
+      action_name: "ConnectToWireless"
+      args {
+        fields {
+          key: "ssid"
+          value {
+            string_value: ""
+          }
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Connectivity Group"
+    subtests {
+      label: "Wi-Fi Antenna Test"
+      action_name: "WiFi"
+      args {
+        fields {
+          key: "ssid"
+          value {
+            string_value: ""
+          }
+        }
+        fields {
+          key: "signalStrengthThresholds"
+          value {
+            list_value {
+              values {
+                number_value: -65
+              }
+              values {
+                number_value: -65
+              }
+              values {
+                number_value: -65
+              }
+            }
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Bluetooth Test (BR/EDR)"
+      action_name: "Bluetooth"
+      args {
+        fields {
+          key: "macAddress"
+          value {
+            string_value: "00:00:00:00:00:00"
+          }
+        }
+        fields {
+          key: "mode"
+          value {
+            string_value: "BLUETOOTH_MODE_CLASSIC"
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Bluetooth Test (LE)"
+      action_name: "Bluetooth"
+      args {
+        fields {
+          key: "macAddress"
+          value {
+            string_value: "00:00:00:00:00:00"
+          }
+        }
+        fields {
+          key: "mode"
+          value {
+            string_value: "BLUETOOTH_MODE_LE"
+          }
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Test USB 2.0 port"
+    action_name: "UsbReadWrite"
+    args {
+      fields {
+        key: "fileSizeToWriteInMb"
+        value {
+          number_value: 30
+        }
+      }
+      fields {
+        key: "sysfsPath"
+        value {
+          string_value: "/sys/bus/usb/devices/3-3:1.0"  # 如果指定端口，填入类似 /sys/bus/usb/devices/3-9:1.0
+        }
+      }
+      fields {
+        key: "minWriteSpeedMb"
+        value {
+          number_value: 10.0  # USB 2.0 最小写入速度 (MB/s)
+        }
+      }
+      fields {
+        key: "minReadSpeedMb"
+        value {
+          number_value: 15.0  # USB 2.0 最小读取速度 (MB/s)
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Test USB 3.0 port"
+    action_name: "UsbReadWrite"
+    args {
+      fields {
+        key: "fileSizeToWriteInMb"
+        value {
+          number_value: 100  # USB 3.0 可用更大文件进行测试
+        }
+      }
+      fields {
+        key: "sysfsPath"
+        value {
+          string_value: "/sys/bus/usb/devices/4-1:1.0"  # 如果指定端口，填入类似 /sys/bus/usb/devices/4-1:1.0
+        }
+      }
+      fields {
+        key: "minWriteSpeedMb"
+        value {
+          number_value: 60.0  # USB 3.0 最小写入速度 (MB/s)
+        }
+      }
+      fields {
+        key: "minReadSpeedMb"
+        value {
+          number_value: 80.0  # USB 3.0 最小读取速度 (MB/s)
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Smart AMP calibration Group"
+    subtests {
+      label: "CS35L56 calibration"
+      action_name: "CS35L56Calibration"
+    }
+    subtests {
+      label: "Tas2563 calibration"
+      action_name: "Tas2563Calibration"
+    }
+    subtests {
+      label: "RT1320 calibration"
+      action_name: "Rt1320Calibration"
+    }
+    subtests {
+      label: "Quartz Audio Calibration Group"
+      subtests {
+        label: "Quartz: Remove legacy calibration"
+        action_name: "ExecShell"
+        args {
+          fields {
+            key: "command"
+            value {
+              string_value: "rm /data/vendor/audio/audio.cal"
+            }
+          }
+        }
+      }
+      subtests {
+        label: "Quartz: Reboot"
+        action_name: "Reboot"
+      }
+      subtests {
+        label: "Quartz: Check and store calibration"
+        action_name: "QuartzAudioCalibration"
+        args {
+          fields {
+            key: "channels"
+            value {
+              number_value: 4
+            }
+          }
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Battery Check"
+    action_name: "BatteryCheck"
+    args {
+      fields {
+        key: "minChargeFullDesign"
+        value {
+          number_value: 4000.0
+        }
+      }
+      fields {
+        key: "maxChargeFullDesign"
+        value {
+          number_value: 8000.0
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Battery Current"
+    action_name: "BatteryCurrent"
+    args {
+      fields {
+        key: "usbpdPort"
+        value {
+          number_value: 0
+        }
+      }
+      fields {
+        key: "maxBatteryLevel"
+        value {
+          number_value: 100
+        }
+      }
+      fields {
+        key: "minChargingCurrentMa"
+        value {
+          number_value: 500
+        }
+      }
+      fields {
+        key: "minDischargingCurrentMa"
+        value {
+          number_value: 300
+        }
+      }
+      fields {
+        key: "currentDifferenceMa"
+        value {
+          number_value: 1000
+        }
+      }
+      fields {
+        key: "timeoutSecs"
+        value {
+          number_value: 10
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Audio Group"
+    subtests {
+      label: "InternalSpeaker"
+      action_name: "AudioLoop"
+      args {
+        fields {
+          key: "testLoopback"
+          value {
+            bool_value: false
+          }
+        }
+        fields {
+          key: "testAudioJack"
+          value {
+            bool_value: false
+          }
+        }
+      }
+    }
+    subtests {
+      label: "ExternalSpeaker"
+      action_name: "AudioLoop"
+      args {
+        fields {
+          key: "testLoopback"
+          value {
+            bool_value: false
+          }
+        }
+        fields {
+          key: "testAudioJack"
+          value {
+            bool_value: true
+          }
+        }
+      }
+    }
+    subtests {
+      label: "SpeakerDmic"
+      action_name: "AudioLoop"
+      args {
+        fields {
+          key: "testLoopback"
+          value {
+            bool_value: true
+          }
+        }
+        fields {
+          key: "bitDepth"
+          value {
+            number_value: 32
+          }
+        }
+        fields {
+          key: "testAudioJack"
+          value {
+            bool_value: false
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Audio Jack Loop Back"
+      action_name: "AudioLoop"
+      args {
+        fields {
+          key: "testLoopback"
+          value {
+            bool_value: true
+          }
+        }
+        fields {
+          key: "testAudioJack"
+          value {
+            bool_value: true
+          }
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Hardware Buttons"
+    subtests {
+      label: "Power button"
+      action_name: "HardwareButton"
+      args {
+        fields {
+          key: "buttonKeyName"
+          value {
+            string_value: "KEY_POWER"
+          }
+        }
+        fields {
+          key: "buttonName"
+          value {
+            string_value: "Power"
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Volume Up"
+      action_name: "HardwareButton"
+      args {
+        fields {
+          key: "buttonKeyName"
+          value {
+            string_value: "KEY_VOLUMEUP"
+          }
+        }
+        fields {
+          key: "buttonName"
+          value {
+            string_value: "Volume Up"
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Volume Down"
+      action_name: "HardwareButton"
+      args {
+        fields {
+          key: "buttonKeyName"
+          value {
+            string_value: "KEY_VOLUMEDOWN"
+          }
+        }
+        fields {
+          key: "buttonName"
+          value {
+            string_value: "Volume Down"
+          }
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Shutdown"
+    action_name: "Shutdown"
+  }
+  subtests {
+    label: "ProvisionVPD"
+    action_name: "ProvisionVPD"
+  }
+  subtests {
+    label: "ProvisionDeviceId"
+    action_name: "ProvisionDeviceId"
+  }
+  subtests {
+    label: "HW descriptor and CBI Provision"
+    should_restart_all_subtests: true
+    subtests {
+      label: "HW descriptor Probe/Provision"
+      action_name: "HwDescProbeProvision"
+      args {
+        fields {
+          key: "mappingTableSource"
+          value {
+            string_value: ""
+          }
+        }
+        fields {
+          key: "mappingTablePatchSource"
+          value {
+            string_value: ""
+          }
+        }
+        fields {
+          key: "isSpareBoard"
+          value {
+            bool_value: false
+          }
+        }
+      }
+    }
+    subtests {
+      label: "HW descriptor Verify"
+      action_name: "HwDescVerify"
+      args {
+        fields {
+          key: "mappingTableSource"
+          value {
+            string_value: ""
+          }
+        }
+        fields {
+          key: "mappingTablePatchSource"
+          value {
+            string_value: ""
+          }
+        }
+        fields {
+          key: "skipPvtMpApprovalCheck"
+          value {
+            bool_value: false
+          }
+        }
+        fields {
+          key: "isSpareBoard"
+          value {
+            bool_value: false
+          }
+        }
+      }
+    }
+    # UpdateCbi must run after HW descriptor provisioning because the
+    # UFSC generator depends on the hardware descriptor.
+    subtests {
+      label: "Reboot"
+      action_name: "Reboot"
+    }
+    subtests {
+      label: "UpdateCbi"
+      action_name: "UpdateCbi"
+    }
+  }
+  subtests {
+    label: "Update GSC firmware"
+    action_name: "UpdateGscFirmware"
+    allow_reboot: true
+    args {
+      fields {
+        key: "forceRoMode"
+        value {
+          bool_value: true
+        }
+      }
+      fields {
+        key: "upstartMode"
+        value {
+          bool_value: false
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Check GSC secdata version"
+    action_name: "CheckSecData"
+    args {
+      fields {
+        key: "majorVersion"
+        value {
+          number_value: 1
+        }
+      }
+      fields {
+        key: "minorVersion"
+        value {
+          number_value: 0
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Update Firmware"
+    action_name: "UpdateFirmware"
+    args {
+      fields {
+        key: "bundledFirmwareName"
+        value {
+          string_value: "firmwareUpdater"
+        }
+      }
+    }
+  }
+  subtests {
+    label: "keyboard test"
+    action_name: "Keyboard"
+  }
+  subtests {
+    label: "Ti50 APRO Verification (PVT)"
+    action_name: "Ti50ApRoVerification"
+    allow_reboot: true
+    args {
+      fields {
+        key: "enableApSwwp"
+        value {
+          bool_value: true
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Ti50 APRO Verification (pre-DVT)"
+    action_name: "Ti50ApRoVerification"
+    allow_reboot: true
+    args {
+      fields {
+        key: "enableApSwwp"
+        value {
+          bool_value: false
+        }
+      }
+    }
+  }
+  subtests {
+    label: "RunIn"
+    action_name: "RunIn"
+    args {
+      fields {
+        key: "numFish"
+        value {
+          number_value: 30000
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Suspend resume stress test"
+    action_name: "SuspendResumeStress"
+  }
+  subtests {
+    label: "FanSpeed Group"
+    subtests {
+      label: "Fan Speed"
+      action_name: "FanSpeed"
+      args {
+        fields {
+          key: "targetRpm"
+          value {
+            list_value {
+              values { number_value: 2500 }
+              values { number_value: 3500 }
+            }
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Fan Speed (Spin Max Then Half)"
+      action_name: "FanSpeed"
+      args {
+        fields {
+          key: "spinMaxThenHalf"
+          value {
+            bool_value: true
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Fan Speed (Percentage Margin)"
+      action_name: "FanSpeed"
+      args {
+        fields {
+          key: "errorMarginUsePercentage"
+          value {
+            bool_value: true
+          }
+        }
+        fields {
+          key: "errorMargin"
+          value {
+            number_value: 10
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Fan Speed (Percentage Target Speed)"
+      action_name: "FanSpeed"
+      args {
+        fields {
+          key: "speedUsePercentage"
+          value {
+            bool_value: true
+          }
+        }
+        fields {
+          key: "targetRpm"
+          value {
+            list_value {
+              values { number_value: 50 }
+              values { number_value: 75 }
+            }
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Fan Speed (Specific fan)"
+      action_name: "FanSpeed"
+      args {
+        fields {
+          key: "fanId"
+          value {
+            number_value: 0
+          }
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Lid Switch Test"
+    action_name: "LidSwitch"
+    args {
+      fields {
+        key: "timeoutSecs"
+        value {
+          number_value: 30
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Download User Image OTA Package"
+    action_name: "SyncFactoryServer"
+    allow_reboot: true
+    args {
+      fields {
+        key: "downloadOtaPackage"
+        value {
+          bool_value: true
+        }
+      }
+    }
+  }
+  subtests {
+    label: "Install User Image OTA Package"
+    action_name: "OtaUpdate"
+  }
+  subtests {
+    label: "Finalize"
+    should_restart_all_subtests: true
+    subtests {
+      label: "Barrier"
+      action_name: "CheckPoint"
+      action_on_failure: ACTION_STOP
+      args {
+        fields {
+          key: "checkFromRoot"
+          value {
+            bool_value: true
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Enable Post ManufacturingApp"
+      action_name: "EnablePostManufacturingApp"
+      action_on_failure: ACTION_STOP
+    }
+    subtests {
+      label: "Vpd Validation"
+      action_name: "VpdValidation"
+      action_on_failure: ACTION_STOP
+    }
+    subtests {
+      label: "Clear TPM owner"
+      action_name: "ClearTpmOwner"
+      action_on_failure: ACTION_STOP
+    }
+    subtests {
+      label: "Verify EK"
+      action_name: "VerifyEk"
+      action_on_failure: ACTION_STOP
+    }
+    subtests {
+      label: "Production Mode Group"
+      subtests {
+        label: "Identify SoC"
+        action_name: "IdentifySoC"
+      }
+      subtests {
+        label: "MTK Production Mode"
+        run_if: {
+          label: "Verify MTK SoC Device Data"
+          action_name: "VerifyDeviceData"
+          args {
+            fields {
+              key: "expectedKeyAndValue"
+              value {
+                list_value: {
+                  values {
+                    string_value: "factory.soc_type"
+                  }
+                  values {
+                    string_value: "MTK"
+                  }
+                }
+              }
+            }
+          }
+        }
+        subtests {
+          label: "Download Efuse from factory Drive"
+          action_name: "DownloadFactoryDrive"
+          args {
+            fields {
+              key: "paths"
+              value {
+                list_value {
+                  values {
+                    list_value {
+                      values {
+                        string_value: "/efuse_dir/efuse_v1.0_jtag_dis"
+                      }
+                      values {
+                        string_value: "/tmp/efuse_v1.0_jtag_dis"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            fields {
+              key: "timeoutSecs"
+              value {
+                number_value: 30
+              }
+            }
+          }
+        }
+        subtests {
+          label: "Program efuse"
+          action_name: "ExecShell"
+          args {
+            fields {
+              key: "command"
+              value {
+                string_value: "/tmp/efuse_v1.0_jtag_dis | grep -q 'efuse blow succ'"
+              }
+            }
+          }
+        }
+        subtests {
+          label: "Reboot"
+          action_name: "Reboot"
+          action_on_failure: ACTION_STOP
+        }
+      }
+      subtests {
+        label: "Intel Production Mode"
+        run_if: {
+          label: "Verify Intel SoC Device Data"
+          action_name: "VerifyDeviceData"
+          args {
+            fields {
+              key: "expectedKeyAndValue"
+              value {
+                list_value: {
+                  values {
+                    string_value: "factory.soc_type"
+                  }
+                  values {
+                    string_value: "INTEL"
+                  }
+                }
+              }
+            }
+          }
+        }
+        subtests {
+          label: "Intel Enable Production Mode"
+          action_name: "IntelEnableProductionMode"
+        }
+      }
+    }
+    subtests {
+      label: "ProvisionGSC"
+      action_name: "ProvisionGSC"
+      action_on_failure: ACTION_STOP
+    }
+    subtests {
+      label: "Enable Ap Write Protect"
+      action_name: "ApWriteProtect"
+      action_on_failure: ACTION_STOP
+    }
+    subtests {
+      label: "Enable Ec Write Protect"
+      action_name: "EcWriteProtect"
+      action_on_failure: ACTION_STOP
+    }
+    subtests {
+      label: "Clear GBB flags"
+      action_name: "ExecShell"
+      action_on_failure: ACTION_STOP
+      args {
+        fields {
+          key: "command"
+          value {
+            string_value: "futility gbb --set --flash --flags=0"
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Disable dev mode"
+      action_name: "ExecShell"
+      action_on_failure: ACTION_STOP
+      args {
+        fields {
+          key: "command"
+          value {
+            string_value: "crossystem disable_dev_request=1"
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Disable GSC factory mode"
+      action_name: "DisableGSCFactoryMode"
+      action_on_failure: ACTION_STOP
+    }
+    subtests {
+      label: "Upload Factory Report"
+      action_name: "SyncFactoryServer"
+      action_on_failure: ACTION_STOP
+      args {
+        fields {
+          key: "uploadReport"
+          value {
+            bool_value: true
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Switch to User Image"
+      action_name: "OtaFinalize"
+      action_on_failure: ACTION_STOP
+    }
+  }
+}
