@@ -26,6 +26,18 @@ tests {
       action_name: "CheckPoint"
     }
   }
+  subtests {
+    label: "设置屏幕常亮"
+    action_name: "ExecShell"
+    args {
+      fields {
+        key: "command"
+        value {
+          string_value: "settings put global stay_on_while_plugged_in 3"    # 3表示充电时屏幕常亮
+        }
+      }
+    }
+  }
 #  subtests {
 #    label: "安装预装应用"
 #   action_name: "InstallPreflashApp"
@@ -74,6 +86,12 @@ tests {
         key: "serverUrl"
         value {
           string_value: "10.17.5.1:8089,10.17.5.2:8089,10.17.5.3:8089"
+        }
+      }
+      fields {
+        key: "timeoutSecs"
+        value {
+          number_value: 999999999
         }
       }
     }
