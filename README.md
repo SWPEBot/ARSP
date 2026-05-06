@@ -1,4 +1,4 @@
-# Kotlin jecktcompose arsp factory app 
+# Kotlin jetpack compose arsp factory app 
 
 
 1.damo.txtpb = test-list
