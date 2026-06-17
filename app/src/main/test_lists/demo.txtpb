@@ -660,9 +660,9 @@ tests {
     action_name: "UsbReadWrite"
   }
   subtests {
-    label: "USB-C Functional Test"
+    label: "Type-C Functional Test"
     subtests {
-      label: "Type-C Port 0 to USB3.0 device"
+      label: "Type-C Port 0 Functional Test"
       action_name: "UsbCFunctionalTest"
       args {
         fields {
@@ -683,10 +683,16 @@ tests {
             string_value: "2-1"
           }
         }
+        fields {
+          key: "enableDisplayTest"
+          value {
+            bool_value: true
+          }
+        }
       }
     }
     subtests {
-      label: "Type-C Port 1 to USB3.0 device"
+      label: "Type-C Port 1 Functional Test"
       action_name: "UsbCFunctionalTest"
       args {
         fields {
@@ -705,6 +711,12 @@ tests {
           key: "port3SysfsPrefix"
           value {
             string_value: "2-2"
+          }
+        }
+        fields {
+          key: "enableDisplayTest"
+          value {
+            bool_value: true
           }
         }
       }
@@ -1190,6 +1202,20 @@ tests {
   subtests {
     label: "keyboard test"
     action_name: "Keyboard"
+    args {
+      fields {
+        key: "layoutIndex"
+        value {
+          number_value: 2
+        }
+      }
+      fields {
+        key: "timeoutSecs"
+        value {
+          number_value: 9999999
+        }
+      }
+    }
   }
   subtests {
     label: "Ti50 APRO Verification (post-DVT)"
