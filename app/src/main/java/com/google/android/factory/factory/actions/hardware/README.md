@@ -6,4 +6,11 @@
 - LCD  ?
   
 ## 侦测硬件
-- TP/CCD/FP/TS/WL/BT/LightSensor
+- Camera
+- Touchpad
+- Touchscreen
+- Fingerprint
+- LightSensor
+- Wireless
+- Bluetooth
+- ......
