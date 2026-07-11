@@ -1,1 +1,3 @@
-update app from umprie server 
+## 同步服务器的APK
+
+- 加入无网络和URL循环等待机制
