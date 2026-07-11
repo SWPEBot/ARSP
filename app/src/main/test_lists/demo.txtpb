@@ -20,11 +20,102 @@ tests {
           }
         }
       }
+    subtests {
+      label: "Barrier"
+      action_name: "CheckPoint"
+      action_on_failure: ACTION_STOP
+    }
+  }
+  subtests {
+    label: "Append GBB flags 0x8000_0000"
+    action_name: "SetGbbFlags"
+    args {
+      fields {
+        key: "flags"
+        value {
+            number_value: 2147483648
+          }
+        }
+        fields {
+          key: "append"
+          value {
+            bool_value: true
+          }
+        }
+      }
     }
     subtests {
       label: "Barrier"
       action_name: "CheckPoint"
       action_on_failure: ACTION_STOP
+    }
+  }
+  subtests {
+    label: "Download Factory Drive"
+    subtests {
+      label: "Download Factory Drive"
+      action_name: "DownloadFactoryDrive"
+      args {
+        fields {
+          key: "paths"
+          value {
+            list_value {
+              values {
+                list_value {
+                  values {
+                    string_value: "/factory/factory.zip"
+                  }
+                  values {
+                    string_value: "/tmp/factory.zip"
+                  }
+                }
+              }
+            }
+          }
+        }
+        fields {
+          key: "serverUrl"
+          value {
+            string_value: "10.17.5.1:8089"
+          }
+        }
+        fields {
+          key: "timeoutSecs"
+          value {
+            number_value: 99999
+          }
+        }
+        fields {
+          key: "passWithoutPrompt"
+          value {
+            bool_value: true
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Sync Factory Drive"
+      action_name: "SyncFactoryDrive"
+      args {
+        fields {
+          key: "timeoutSecs"
+          value {
+            number_value: 30
+          }
+        }
+        fields {
+          key: "serverUrl"
+          value {
+            string_value: "10.17.5.1:8089"
+          }
+        }
+        fields {
+          key: "passWithoutPrompt"
+          value {
+            bool_value: true
+          }
+        }
+      }
     }
   }
   subtests {
@@ -34,6 +125,14 @@ tests {
   subtests {
     label: "Update Factory App"
     action_name: "UpdateAppFromUmpire"
+    args {
+      fields {
+        key: "serverUrl"
+        value {
+          string_value: "10.17.5.1:8089"
+        }
+      }
+    }
   }
   subtests {
     label: "Sync Device Time"
@@ -43,6 +142,12 @@ tests {
         key: "syncDeviceTime"
         value {
           bool_value: true
+        }
+      }
+      fields {
+        key: "serverUrl"
+        value {
+          string_value: "10.17.5.1:8089"
         }
       }
     }
@@ -56,6 +161,24 @@ tests {
     subtests {
       label: "Storage Simple Stress"
       action_name: "StorageSimpleStress"
+    }
+  }
+  subtests {
+    label: "DRAM Identification"
+    action_name: "DramIdentification"
+    args {
+      fields {
+        key: "checkSize"
+        value { 
+          bool_value: true 
+        }
+      }
+      fields {
+        key: "checkSlots"
+        value { 
+          bool_value: true 
+        }
+      }
     }
   }
   subtests {
@@ -76,6 +199,89 @@ tests {
       }
     }
   }
+  subtests {
+    label: "USBC 20V Power Check"
+    subtests {
+      label: "Left USB-C 20V Power Check"
+      action_name: "BatteryCurrent"
+      args {
+        fields {
+          key: "usbpdPort"
+          value {
+            number_value: 0
+          }
+        }
+        fields {
+          key: "minVoltageMv"
+          value {
+            number_value: 19000
+          }
+        }
+        fields {
+          key: "maxVoltageMv"
+          value {
+            number_value: 21000
+          }
+        }
+        fields {
+          key: "timeoutSecs"
+          value {
+            number_value: 9999
+          }
+        }
+      }
+    }
+    subtests {
+      label: "Right USB-C 20V Power Check"
+      action_name: "BatteryCurrent"
+      args {
+        fields {
+          key: "usbpdPort"
+          value {
+            number_value: 1
+          }
+        }
+        fields {
+          key: "minVoltageMv"
+          value {
+            number_value: 19000
+          }
+        }
+        fields {
+          key: "maxVoltageMv"
+          value {
+            number_value: 21000
+          }
+        }
+        fields {
+          key: "timeoutSecs"
+          value {
+            number_value: 9999
+          }
+        }
+      }
+    }
+  }
+  subtests {
+    label: "SMT Hardware Probe"
+    action_name: "HardwareProbe"
+      args {
+        fields {
+          key: "probes"
+          value {
+            list_value {
+              values { string_value: "Camera: ls /sys/class/video4linux/video0" }
+              values { string_value: "Touchpad: grep -q 'Touchpad' /proc/bus/input/devices" }
+              values { string_value: "Touchscreen: grep -qiE 'Elan' /proc/bus/input/devices" }
+              values { string_value: "Fingerprint: ectool --name=cros_ish version" }
+              values { string_value: "LightSensor: ls /sys/bus/iio/devices/iio:device0" }
+              values { string_value: "Wireless: ls /sys/class/net/wlan0" }
+              values { string_value: "Bluetooth: test -d /sys/class/bluetooth/hci0" }
+            }
+          }
+        }
+      }
+    }
   subtests {
     label: "camera_group"
     subtests {
@@ -519,26 +725,6 @@ tests {
     subtests {
       label: "Backlight"
       action_name: "Backlight"
-      args {
-        fields{
-          key: "adjustLevel"
-          value {
-            number_value: 20
-          }
-        }
-        fields {
-          key: "resetLevel"
-          value {
-            number_value: 120
-          }
-        }
-        fields {
-          key: "minLevel"
-          value {
-            number_value: 20
-          }
-        }
-      }
     }
     subtests {
       label: "External Display"
@@ -591,8 +777,8 @@ tests {
   subtests {
     label: "Connectivity Group"
     subtests {
-      label: "Wi-Fi Antenna Test"
-      action_name: "WiFi"
+      label: "Wi-Fi Test"
+      action_name: "Wifi"
       args {
         fields {
           key: "ssid"
@@ -684,9 +870,9 @@ tests {
           }
         }
         fields {
-          key: "enableDisplayTest"
+          key: "displayId"
           value {
-            bool_value: true
+            string_value: "DP-1"
           }
         }
       }
@@ -714,9 +900,9 @@ tests {
           }
         }
         fields {
-          key: "enableDisplayTest"
+          key: "displayId"
           value {
-            bool_value: true
+            string_value: "DP-2"
           }
         }
       }
@@ -786,89 +972,44 @@ tests {
       }
     }
   }
-  subtests {
+   subtests {
     label: "Battery Current"
-    subtests {
-      label: "Type-C Port 0 Battery Current"
-      action_name: "BatteryCurrent"
-      args {
-        fields {
-          key: "usbpdPort"
-          value {
-            number_value: 0
-          }
-        }
-        fields {
-          key: "maxBatteryLevel"
-          value {
-            number_value: 100
-          }
-        }
-        fields {
-          key: "minChargingCurrentMa"
-          value {
-            number_value: 500
-          }
-        }
-        fields {
-          key: "minDischargingCurrentMa"
-          value {
-            number_value: 300
-          }
-        }
-        fields {
-          key: "currentDifferenceMa"
-          value {
-            number_value: 1000
-          }
-        }
-        fields {
-          key: "timeoutSecs"
-          value {
-            number_value: 9999999
-          }
+    action_name: "BatteryCurrent"
+    args {
+      fields {
+        key: "usbpdPort"
+        value {
+          number_value: 0
         }
       }
-    }
-    subtests {
-      label: "Type-C Port 1 Battery Current"
-      action_name: "BatteryCurrent"
-      args {
-        fields {
-          key: "usbpdPort"
-          value {
-            number_value: 1
-          }
+      fields {
+        key: "maxBatteryLevel"
+        value {
+          number_value: 100
         }
-        fields {
-          key: "maxBatteryLevel"
-          value {
-            number_value: 100
-          }
+      }
+      fields {
+        key: "minChargingCurrentMa"
+        value {
+          number_value: 500
         }
-        fields {
-          key: "minChargingCurrentMa"
-          value {
-            number_value: 500
-          }
+      }
+      fields {
+        key: "minDischargingCurrentMa"
+        value {
+          number_value: 300
         }
-        fields {
-          key: "minDischargingCurrentMa"
-          value {
-            number_value: 300
-          }
+      }
+      fields {
+        key: "currentDifferenceMa"
+        value {
+          number_value: 1000
         }
-        fields {
-          key: "currentDifferenceMa"
-          value {
-            number_value: 1000
-          }
-        }
-        fields {
-          key: "timeoutSecs"
-          value {
-            number_value: 9999999
-          }
+      }
+      fields {
+        key: "timeoutSecs"
+        value {
+          number_value: 10
         }
       }
     }
@@ -877,50 +1018,32 @@ tests {
     label: "Audio Group"
     subtests {
       label: "InternalSpeaker"
-      action_name: "AudioLoop"
+      action_name: "PlayAudio"
       args {
         fields {
-          key: "testLoopback"
+          key: "target"
           value {
-            bool_value: false
-          }
-        }
-        fields {
-          key: "testAudioJack"
-          value {
-            bool_value: false
+            string_value: "BUILT_IN_SPEAKER"
           }
         }
       }
     }
     subtests {
       label: "ExternalSpeaker"
-      action_name: "AudioLoop"
+      action_name: "PlayAudio"
       args {
         fields {
-          key: "testLoopback"
+          key: "target"
           value {
-            bool_value: false
-          }
-        }
-        fields {
-          key: "testAudioJack"
-          value {
-            bool_value: true
+            string_value: "AUDIO_JACK"
           }
         }
       }
     }
     subtests {
       label: "SpeakerDmic"
-      action_name: "AudioLoop"
+      action_name: "AudioLoopbackCheck"
       args {
-        fields {
-          key: "testLoopback"
-          value {
-            bool_value: true
-          }
-        }
         fields {
           key: "bitDepth"
           value {
@@ -928,27 +1051,27 @@ tests {
           }
         }
         fields {
-          key: "testAudioJack"
+          key: "target"
           value {
-            bool_value: false
+            string_value: "FRONT_MIC"
           }
         }
       }
     }
     subtests {
       label: "Audio Jack Loop Back"
-      action_name: "AudioLoop"
+      action_name: "AudioLoopbackCheck"
       args {
         fields {
-          key: "testLoopback"
+          key: "target"
           value {
-            bool_value: true
+            string_value: "AUDIO_JACK"
           }
         }
         fields {
-          key: "testAudioJack"
+          key: "bitDepth"
           value {
-            bool_value: true
+            number_value: 16
           }
         }
         fields {
@@ -1371,7 +1494,7 @@ tests {
   }
   subtests {
     label: "Finalize"
-    should_restart_all_subtests: false
+    should_restart_all_subtests: true
     subtests {
       label: "Barrier"
       action_name: "CheckPoint"
@@ -1517,9 +1640,86 @@ tests {
             }
           }
         }
+        # Download necessary files to `/tmp` directory.
+        subtests {
+          label: "Download files from factory Drive"
+          action_name: "DownloadFactoryDrive"
+          args {
+            fields {
+              key: "paths"
+              value {
+                list_value {
+                  values {
+                    list_value {
+                      values {
+                        string_value: "/MEManuf_dir/MEManuf"
+                      }
+                      values {
+                        string_value: "/tmp/MEManuf"
+                      }
+                    }
+                  }
+                  values {
+                    list_value {
+                      values {
+                        string_value: "/xml_dir/project_eol.xml"
+                      }
+                      values {
+                        string_value: "/tmp/project_eol.xml"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            fields {
+              key: "timeoutSecs"
+              value {
+                number_value: 30
+              }
+            }
+          }
+        }
         subtests {
           label: "Intel Enable Production Mode"
           action_name: "IntelEnableProductionMode"
+        }
+      }
+      # Make sure the image signing is completed before running this test item,
+      # otherwise the device will fail to boot. See b/453566273#comment30 for
+      # more details.
+      subtests {
+        label: "Qualcomm Production Mode"
+        run_if: {
+          label: "Verify QCOM SoC Device Data"
+          action_name: "VerifyDeviceData"
+          args {
+            fields {
+              key: "expectedKeyAndValue"
+              value {
+                list_value: {
+                  values {
+                    string_value: "factory.soc_type"
+                  }
+                  values {
+                    string_value: "QCOM"
+                  }
+                }
+              }
+            }
+          }
+        }
+        subtests {
+          label: "QCOM Enable Production Mode"
+          action_name: "ExecShell"
+          args {
+            fields {
+              key: "command"
+              value {
+                string_value: "qfprom_program_fuses.sh"
+              }
+            }
+          }
         }
       }
     }
