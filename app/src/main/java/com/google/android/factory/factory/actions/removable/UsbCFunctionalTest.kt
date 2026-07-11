@@ -23,12 +23,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -48,10 +48,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.google.android.factory.factory.ui.display.ExternalDisplayPresentation
 import com.google.android.factory.factory.viewmodel.display.ExternalDisplayTestPhase
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cable
+import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.Monitor
 
 private val ColorPass = Color(0xFF2E7D32)
 private val ColorFail = Color(0xFFC62828)
@@ -62,8 +63,6 @@ private val ColorRunning = Color(0xFFE65100)
 fun UsbCFunctionalTestScreen(viewModel: UsbCFunctionalTestViewModel, modifier: Modifier = Modifier) {
   val ui by viewModel.ui.collectAsStateWithLifecycle()
   val scrollState = rememberScrollState()
-  val context = LocalContext.current
-  val lifecycleOwner = LocalLifecycleOwner.current
   val onKeyPressed = { event: KeyEvent ->
     if (event.type == KeyEventType.KeyDown) {
       viewModel.checkIsRightDisplayProof(event.key)
@@ -76,24 +75,7 @@ fun UsbCFunctionalTestScreen(viewModel: UsbCFunctionalTestViewModel, modifier: M
   val requester = remember { FocusRequester() }
   LaunchedEffect(Unit) { requester.requestFocus() }
 
-  DisposableEffect(ui.hdmiTestPhase) {
-    var presentation: ExternalDisplayPresentation? = null
-    val currentPhase = ui.hdmiTestPhase
-    if (currentPhase is ExternalDisplayTestPhase.TESTING) {
-      presentation =
-        ExternalDisplayPresentation(
-          outerContext = context,
-          lifecycleOwner = lifecycleOwner,
-          display = currentPhase.externalDisplay,
-          text = "Press number ${currentPhase.displayProof} to pass the test",
-        ) { key ->
-          viewModel.checkIsRightDisplayProof(key)
-        }
-      presentation.show()
-    }
-
-    onDispose { presentation?.dismiss() }
-  }
+  UsbCExternalDisplayPresentationHost(ui.hdmiTestPhase, viewModel::checkIsRightDisplayProof)
 
   Column(
     modifier = modifier
@@ -118,6 +100,14 @@ fun UsbCFunctionalTestScreen(viewModel: UsbCFunctionalTestViewModel, modifier: M
     // TypeC CC1/CC2 orientation — full-width live-monitor card, shown when CC test is enabled.
     ui.ccPhase?.let { phase ->
       TypeCCcCard(phase = phase, port1 = ui.port1, port2 = ui.port2, hdmiPort = ui.hdmiPort)
+    }
+
+    if (!ui.hdmiPort.isFinished && ui.hdmiPort.status != "SKIPPED") {
+      HdmiInstructionCard(
+        phase = ui.hdmiTestPhase,
+        isConnected = ui.hdmiPort.isPresent,
+        modifier = Modifier.fillMaxWidth(),
+      )
     }
   }
 }
@@ -302,6 +292,71 @@ private fun OverallStatusBanner(ui: UsbCFunctionalTestUiState) {
       fontWeight = FontWeight.Bold,
       color = Color.White,
     )
+  }
+}
+
+@Composable
+private fun HdmiInstructionCard(
+  phase: ExternalDisplayTestPhase?,
+  isConnected: Boolean,
+  modifier: Modifier = Modifier,
+) {
+  data class HdmiHint(
+    val color: Color,
+    val icon: @Composable () -> Unit,
+    val title: String,
+    val body: String,
+  )
+
+  val hint =
+    when (phase) {
+      is ExternalDisplayTestPhase.TESTING ->
+        HdmiHint(
+          color = ColorRunning.copy(alpha = 0.14f),
+          icon = { Icon(Icons.Filled.Keyboard, contentDescription = null, tint = ColorRunning) },
+          title = "Display test in progress",
+          body = "Look at the external display, then press the same number shown on that screen using the keyboard.",
+        )
+      else ->
+        HdmiHint(
+          color = if (isConnected) ColorWaiting.copy(alpha = 0.14f) else MaterialTheme.colorScheme.surfaceVariant,
+          icon = {
+            Icon(
+              if (isConnected) Icons.Filled.Monitor else Icons.Filled.Cable,
+              contentDescription = null,
+              tint = if (isConnected) ColorWaiting else MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+          },
+          title = if (isConnected) "Display detected" else "Connect external display",
+          body =
+            if (isConnected) {
+              "The USB-C display is connected. Wait for the number prompt to appear on the external screen."
+            } else {
+              "Connect one external display to the USB-C port under test. After the screen lights up, follow the number prompt shown there."
+            },
+        )
+    }
+
+  Card(
+    modifier = modifier,
+    shape = RoundedCornerShape(12.dp),
+    colors = CardDefaults.cardColors(containerColor = hint.color),
+  ) {
+    Row(
+      modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+      hint.icon()
+      Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(
+          text = hint.title,
+          style = MaterialTheme.typography.titleSmall,
+          fontWeight = FontWeight.Bold,
+        )
+        Text(text = hint.body, style = MaterialTheme.typography.bodySmall)
+      }
+    }
   }
 }
 
