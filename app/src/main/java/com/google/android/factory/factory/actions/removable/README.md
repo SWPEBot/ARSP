@@ -1,1 +1,5 @@
-TypeC Function Test
+## USBC 功能测试
+
+- 调整测试顺序 先CC1 再CC2
+- 每插入USB设备必检查正负极状态
+- ......
