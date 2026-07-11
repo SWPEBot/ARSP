@@ -1,5 +1,4 @@
 package com.google.android.factory.factory.actions.keyboard
-
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.ComponentName
@@ -16,7 +15,6 @@ import java.io.File
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
-
 /**
  * The arguments class for the Keyboard action.
  *
@@ -28,7 +26,6 @@ data class KeyboardArgs(
   var layoutIndex: Int = 1,
   var detectUnexistingKey: Boolean = false,
 )
-
 data class InputDeviceData(
   val id: Int, // The ID listed in dumpsys output.
   val name: String,
@@ -36,7 +33,6 @@ data class InputDeviceData(
   var sysfsDevicePath: String? = null,
   var deviceId: String? = null, // The device ID in sysfs path.
 )
-
 class KeyboardViewModel(
   private val controller: SimpleMessageScreenController = SimpleMessageScreenController()
 ) : FactoryActionViewModel<KeyboardArgs>(), SimpleMessageScreenViewModelInterface by controller {
@@ -45,7 +41,6 @@ class KeyboardViewModel(
   private var driverPath: String? = null
   private var testKeyLayoutFileIsMounted = false
   private var powerButtonShortPressIsDisabled = false
-
   override suspend fun runActionImpl(): FactoryActionResult {
     val dumpsysOutput = factoryContext.adbClient.runShellCommand("dumpsys input").outText
     defaultKeyboard = parseDefaultKeyboard(dumpsysOutput)
@@ -53,20 +48,17 @@ class KeyboardViewModel(
       Log.error("Failed to parse default keyboard from dumpsys output.")
       return FactoryActionResult.Failure
     }
-
     Log.info("Default keyboard: ${defaultKeyboard}")
     driverPath =
       factoryContext.adbClient
         .runShellCommand("realpath ${defaultKeyboard!!.sysfsDevicePath}/driver")
         .outText
         .trim()
-
     testKeyLayoutFile = generateTestKeyboardLayout(File(defaultKeyboard!!.keyLayoutFile!!))
     if (testKeyLayoutFile == null) {
       Log.error("Failed to generate test keyboard layout.")
       return FactoryActionResult.Failure
     }
-
     factoryContext.adbClient.openAdbShell().use { shell ->
       // Disable the power button short press since some project have power button on keyboard.
       shell.runAndCheck("settings put global power_button_short_press 0")
@@ -91,7 +83,6 @@ class KeyboardViewModel(
           ComponentName(DIAGNOSTIC_APP_PACKAGE_NAME, DIAGNOSTIC_APP_KEYBOARD_TEST_ACTIVITY_NAME)
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
       }
-
     val result =
       withTimeoutOrNull(args.timeoutSecs.seconds) {
         factoryContext.intentResultProxy.startActivityForResult(intent, keyboardDiagArgs)
@@ -107,20 +98,21 @@ class KeyboardViewModel(
     }
     return FactoryActionResult.Success
   }
-
   private suspend fun generateTestKeyboardLayout(originalKeyLayoutFile: File): String? {
     val appCacheDir = factoryContext.applicationContext.cacheDir
-
+    val legacyCopiedKeyLayoutFile = File(appCacheDir, originalKeyLayoutFile.name)
     // Since we cannot directly read or alter the original key layout file, we need to copy it to
     // the app cache directory first.
     val copiedKeyLayoutFile = File(appCacheDir.absolutePath, originalKeyLayoutFile.name)
     factoryContext.adbClient.openAdbShell().use { shell ->
+      // Clean up the previously used fixed cache path so older builds do not leave behind a
+      // relabeled file that can no longer be rewritten by the app process.
+      shell.runAndCheck("rm -f ${legacyCopiedKeyLayoutFile.absolutePath}")
       shell.runAndCheck(
         "cp ${originalKeyLayoutFile.absolutePath} ${copiedKeyLayoutFile.absolutePath}"
       )
       shell.runAndCheck("chown u10_system:u10_system ${copiedKeyLayoutFile.absolutePath}")
     }
-
     val newFileContent = java.lang.StringBuilder()
     try {
       // Read line by line and append to our StringBuilder
@@ -130,10 +122,8 @@ class KeyboardViewModel(
           return@forEachLine
         }
         val matchResult = Regex("^\\s*key\\s+(\\d+)\\s+.*").find(line)
-
         if (matchResult != null) {
           val scancode = matchResult.groupValues[1].toIntOrNull()
-
           if (scancode != null && TARGET_SCANCODES.contains(scancode)) {
             newFileContent.append("key $scancode\t$KEY_PLACEHOLDER\n")
             Log.info("Remapped scancode $scancode to $KEY_PLACEHOLDER")
@@ -157,39 +147,36 @@ class KeyboardViewModel(
       return null
     }
   }
-
   fun parseDefaultKeyboard(dumpsysOutput: String): InputDeviceData? {
     val devices = mutableMapOf<Int, InputDeviceData>()
     var builtInId: Int? = null
-
     var inEventHubState: Boolean = false
     var id: Int? = null
-
     // Use lineSequence() for memory-efficient lazy evaluation
     dumpsysOutput.lineSequence().forEach { line ->
       val trimmed = line.trim()
-
       // 1. Scope strictly to the "Event Hub State" section
-      if (trimmed == "Event Hub State:") {
+      if (trimmed.endsWith("Event Hub State:")) {
         inEventHubState = true
+        id = null
         return@forEach // Continue to next line in the sequence
       }
-
       // Stop parsing if we hit the next major dumpsys section to save time
       if (
         inEventHubState &&
-          (trimmed == "Input Reader State:" || trimmed == "Input Dispatcher State:")
+          trimmed.endsWith("State:") &&
+          trimmed != "Event Hub State:"
       ) {
         inEventHubState = false
+        id = null
         return@forEach
       }
-
       if (inEventHubState) {
         // 2. Find the designated Built-In Keyboard ID
         if (trimmed.startsWith("BuiltInKeyboardId:")) {
           builtInId = trimmed.substringAfter(":").trim().toIntOrNull()
+          Log.info("Found BuiltInKeyboardId: $builtInId")
         }
-
         // 3. Detect new device blocks (Matches lines like "-1: Virtual" or "2: gpio-keys")
         val deviceMatch = Regex("^(-?\\d+):\\s+(.*)$").find(trimmed)
         if (deviceMatch != null) {
@@ -197,7 +184,6 @@ class KeyboardViewModel(
           val deviceName = deviceMatch.groupValues[2]
           devices[id] = InputDeviceData(id, deviceName)
         }
-
         // 4. Extract target properties for the currently scoped device
         if (id != null) {
           if (trimmed.startsWith("KeyLayoutFile:")) {
@@ -220,9 +206,29 @@ class KeyboardViewModel(
       Log.error("Built-in keyboard ID not found.")
       return null
     }
-    return devices[builtInId]!!
-  }
+    val builtInKeyboard = devices[builtInId]?.takeIf { it.isUsableKeyboardCandidate() }
+    if (builtInKeyboard != null) {
+      return builtInKeyboard
+    }
 
+    // Some DUTs report a sentinel BuiltInKeyboardId such as -2 instead of a real device block ID.
+    val fallbackDevice =
+      devices.values
+        .filter { it.isUsableKeyboardCandidate() }
+        .maxByOrNull { it.keyboardCandidateScore() }
+
+    if (fallbackDevice != null) {
+      Log.warn(
+        "BuiltInKeyboardId $builtInId did not map to a device block; falling back to ${fallbackDevice.id}: ${fallbackDevice.name}"
+      )
+      return fallbackDevice
+    }
+
+    Log.error(
+      "BuiltInKeyboardId $builtInId did not map to a keyboard device. Parsed devices: ${devices.keys.sorted()}"
+    )
+    return null
+  }
   @SuppressLint("NewApi")
   override suspend fun tearDown() {
     val activityManager =
@@ -251,7 +257,6 @@ class KeyboardViewModel(
       }
     }
   }
-
   companion object {
     val TARGET_SCANCODES =
       mapOf<Int, String>(
@@ -273,7 +278,6 @@ class KeyboardViewModel(
         116 to "POWER",
         152 to "COFFEE",
       )
-
     const val KEY_PLACEHOLDER = "STEM_1"
     const val FALLBACK_MAPPING_KEYWORD = "FALLBACK_USAGE_MAPPING"
     const val DIAGNOSTIC_APP_PACKAGE_NAME = "com.google.android.factory.diagnostics"
@@ -281,9 +285,28 @@ class KeyboardViewModel(
       "com.google.android.factory.diagnostics.FactoryKeyboardActivity"
     const val DIAGNOSTIC_APP_KEYBOARD_TEST_ACTION =
       "com.google.android.factory.diagnostics.ACTION_FACTORY_KEYBOARD"
-
     const val EXTRA_LAYOUT_INDEX = "layout_index"
     const val EXTRA_DETECT_UNEXISTING_KEY = "detect_unexisting_key"
     const val EXTRA_RESULT_KEY = "success"
   }
+}
+
+private fun InputDeviceData.isUsableKeyboardCandidate(): Boolean =
+  !keyLayoutFile.isNullOrBlank() &&
+    !sysfsDevicePath.isNullOrBlank() &&
+    !deviceId.isNullOrBlank() &&
+    !name.equals("Virtual", ignoreCase = true)
+
+private fun InputDeviceData.keyboardCandidateScore(): Int {
+  var score = 0
+  val lowerName = name.lowercase()
+  val lowerLayout = keyLayoutFile?.lowercase().orEmpty()
+
+  if ("keyboard" in lowerName) score += 4
+  if ("gpio" in lowerName) score += 2
+  if ("cros" in lowerName || "matrix" in lowerName) score += 2
+  if (lowerLayout.endsWith(".kl")) score += 1
+  if ("virtual" in lowerName) score -= 10
+
+  return score
 }
