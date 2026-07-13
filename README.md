@@ -1,22 +1,22 @@
-# Kotlin jetpack compose arsp factory app 
+# ARSP Factory App Guide
 
 
-1.damo.txtpb = test-list
+- damo.txtpb = test-list
 
 *路径:app/src/main/test_lists/xxxxxx.txtpb*
 
-2.actions = pytests
+- actions = pytests
 
 *路径:app/src/main/java/com/google/android/factory/factory/actions/*
 
-3.domain = basecode (core)
+- domain = basecode (core)
 
 *路径:app/src/main/java/com/google/android/factory/factory/domain/*
 
-4.ui = javascripts (UI)
+- ui = javascripts (UI)
 
 *路径:app/src/main/java/com/google/android/factory/factory/ui/*
 
-5.Add config
+- Add Test item
 
-ActionAggregator.kt  新增actions，kt，test-list 请在此文件添加才能编译
+ActionAggregator.kt  新增action ui demo.txtpb
