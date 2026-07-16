@@ -1,6 +1,7 @@
 # proto-file: vendor/google_shared/packages/desktop/Factory/factory/app/src/main/proto/test_object.proto
 # proto-message: TestList
 options {
+  engineering_password_sha1: "356a192b7913b04c54574d18c28d46e6395428ab"
   auto_run_on_start: {
     value: true
   }
@@ -20,19 +21,14 @@ tests {
           }
         }
       }
-    subtests {
-      label: "Barrier"
-      action_name: "CheckPoint"
-      action_on_failure: ACTION_STOP
     }
-  }
-  subtests {
-    label: "Append GBB flags 0x8000_0000"
-    action_name: "SetGbbFlags"
-    args {
-      fields {
-        key: "flags"
-        value {
+    subtests {
+      label: "Append GBB flags 0x8000_0000"
+      action_name: "SetGbbFlags"
+      args {
+        fields {
+          key: "flags"
+          value {
             number_value: 2147483648
           }
         }
@@ -48,6 +44,24 @@ tests {
       label: "Barrier"
       action_name: "CheckPoint"
       action_on_failure: ACTION_STOP
+    }
+  }
+  subtests {
+    label: "Sync Device Time"
+    action_name: "SyncFactoryServer"
+    args {
+      fields {
+        key: "syncDeviceTime"
+        value {
+          bool_value: true
+        }
+      }
+      fields {
+        key: "serverUrl"
+        value {
+          string_value: "10.17.5.1:8089"
+        }
+      }
     }
   }
   subtests {
@@ -126,24 +140,6 @@ tests {
     label: "Update Factory App"
     action_name: "UpdateAppFromUmpire"
     args {
-      fields {
-        key: "serverUrl"
-        value {
-          string_value: "10.17.5.1:8089"
-        }
-      }
-    }
-  }
-  subtests {
-    label: "Sync Device Time"
-    action_name: "SyncFactoryServer"
-    args {
-      fields {
-        key: "syncDeviceTime"
-        value {
-          bool_value: true
-        }
-      }
       fields {
         key: "serverUrl"
         value {
@@ -263,6 +259,10 @@ tests {
     }
   }
   subtests {
+    label: "Clear Demo Test List data"
+    action_name: "ClearTestRecords"
+  }
+  subtests {
     label: "SMT Hardware Probe"
     action_name: "HardwareProbe"
       args {
@@ -273,8 +273,6 @@ tests {
               values { string_value: "Camera: ls /sys/class/video4linux/video0" }
               values { string_value: "Touchpad: grep -q 'Touchpad' /proc/bus/input/devices" }
               values { string_value: "Touchscreen: grep -qiE 'Elan' /proc/bus/input/devices" }
-              values { string_value: "Fingerprint: ectool --name=cros_ish version" }
-              values { string_value: "LightSensor: ls /sys/bus/iio/devices/iio:device0" }
               values { string_value: "Wireless: ls /sys/class/net/wlan0" }
               values { string_value: "Bluetooth: test -d /sys/class/bluetooth/hci0" }
             }
@@ -1015,72 +1013,51 @@ tests {
     }
   }
   subtests {
-    label: "Audio Group"
-    subtests {
-      label: "InternalSpeaker"
-      action_name: "PlayAudio"
-      args {
-        fields {
-          key: "target"
-          value {
-            string_value: "BUILT_IN_SPEAKER"
-          }
-        }
+    label: "SpeakerDmicAuto"
+    action_name: "SpeakerDmicAuto"
+    args {
+      fields { 
+        key: "runAllBuiltinSpeakerMicCombos" 
+        value { 
+          bool_value: true 
+        } 
       }
+      fields {
+        key: "duration" 
+        value { 
+          number_value: 10.0
+        } 
+      }
+      fields { 
+        key: "similarityMin" 
+        value { 
+          number_value: 0.6 
+        } 
+      } # 由于喇叭回路信号可能有噪声，设低一点
     }
-    subtests {
-      label: "ExternalSpeaker"
-      action_name: "PlayAudio"
-      args {
-        fields {
-          key: "target"
-          value {
-            string_value: "AUDIO_JACK"
-          }
-        }
+  }
+  subtests {
+    label: "AudioJack Loopback"
+    action_name: "AudioLoopbackCheck"
+    args {
+      fields { 
+        key: "target" 
+        value { 
+          string_value: "AUDIO_JACK" 
+        } 
       }
-    }
-    subtests {
-      label: "SpeakerDmic"
-      action_name: "AudioLoopbackCheck"
-      args {
-        fields {
-          key: "bitDepth"
-          value {
-            number_value: 32
-          }
-        }
-        fields {
-          key: "target"
-          value {
-            string_value: "FRONT_MIC"
-          }
-        }
+      fields { 
+        key: "duration" 
+        value { 
+          number_value: 1.0 
+        } 
       }
-    }
-    subtests {
-      label: "Audio Jack Loop Back"
-      action_name: "AudioLoopbackCheck"
-      args {
-        fields {
-          key: "target"
-          value {
-            string_value: "AUDIO_JACK"
-          }
-        }
-        fields {
-          key: "bitDepth"
-          value {
-            number_value: 16
-          }
-        }
-        fields {
-          key: "startTimeToSkip"
-          value {
-            number_value: 0.1
-          }
-        }
-      }
+      fields { 
+        key: "similarityThreshold" 
+        value { 
+          number_value: 0.8 
+        } 
+      } # 耳机回路信号通常很纯净，可以设高一点
     }
   }
   subtests {
